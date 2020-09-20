@@ -22,15 +22,8 @@ func (m MortemCollector) Collect() error {
 
 	var newFiles []*github.TreeEntry
 
-	if !containsMortemDirectory(files) {
-		newFiles = append(newFiles,
-			&github.TreeEntry{
-				Path:    github.String("mortems/template.md"),
-				Mode:    github.String("100644"),
-				Type:    github.String("blob"),
-				Content: github.String("<!-- Make sure that"),
-			},
-		)
+	if !containsFile(files, "mortems/template.md") {
+		newFiles = append(newFiles, newTreeEntryFile("mortems/template.md", postMortemTemplate))
 	}
 
 	if len(newFiles) > 0 {
@@ -43,9 +36,18 @@ func (m MortemCollector) Collect() error {
 	return nil
 }
 
-func containsMortemDirectory(files []*github.TreeEntry) bool {
+func newTreeEntryFile(path string, content string) *github.TreeEntry {
+	return &github.TreeEntry{
+		Path:    github.String(path),
+		Mode:    github.String("100644"),
+		Type:    github.String("blob"),
+		Content: github.String(content),
+	}
+}
+
+func containsFile(files []*github.TreeEntry, path string) bool {
 	for _, file := range files {
-		if file.GetPath() == "mortems" {
+		if file.GetPath() == path {
 			return true
 		}
 	}

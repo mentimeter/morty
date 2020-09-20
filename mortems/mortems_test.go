@@ -28,12 +28,12 @@ var _ = Describe("Mortems", func() {
 		mortems = NewMortemCollector(gitService)
 	})
 
-	Context("when the repository contains no post-mortems directory", func() {
+	Context("when the repository contains no template", func() {
 		BeforeEach(func() {
-			gitService.GetFilesReturns(treeEntryFixtures["no-mortems-dir"], nil)
+			gitService.GetFilesReturns(treeEntryFixtures["no-template"], nil)
 		})
 
-		It("creates the mortems directory", func() {
+		It("creates the post-mortem template in the right place", func() {
 			Expect(mortems.Collect()).To(Succeed())
 
 			Expect(gitService.GetFilesCallCount()).To(Equal(1))
@@ -41,18 +41,19 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles).To(ContainElement(ContainFileSubstring("mortems/template.md", "<!-- Make sure that")))
+			Expect(updateFiles).To(ContainFileWithSubstring("mortems/template.md", "<!-- The title of your incident. "))
+			Expect(updateFiles).To(ContainFileWithSubstring("mortems/template.md", "Global Love Chaos"))
 		})
 	})
 })
 
-func ContainFileSubstring(path, contentSubstring string) types.GomegaMatcher {
-	return And(
+func ContainFileWithSubstring(path, contentSubstring string) types.GomegaMatcher {
+	return ContainElement(And(
 		WithTransform(GetPath, Equal(path)),
 		WithTransform(GetMode, Equal("100644")),
 		WithTransform(GetType, Equal("blob")),
 		WithTransform(GetContent, ContainSubstring(contentSubstring)),
-	)
+	))
 }
 
 func GetPath(e *github.TreeEntry) string {
