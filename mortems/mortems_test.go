@@ -41,13 +41,6 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-
-			Expect(updateFiles).To(ContainElement(&github.TreeEntry{
-				Path: github.String("mortems"),
-				Mode: github.String("040000"),
-				Type: github.String("tree"),
-			}))
-
 			Expect(updateFiles).To(ContainElement(ContainFileSubstring("mortems/template.md", "<!-- Make sure that")))
 		})
 	})
