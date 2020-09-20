@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ostenbom/morty/mortems"
 	"github.com/sethvargo/go-githubactions"
 )
+
+var ErrMissingInput = errors.New("missing required input")
 
 func main() {
 	if err := run(); err != nil {
@@ -18,11 +21,22 @@ func main() {
 func run() error {
 	token := githubactions.GetInput("token")
 	if token == "" {
-		return errors.New("missing 'token'")
+		return fmt.Errorf("no github token: %w", ErrMissingInput)
 	}
 
-	fmt.Printf("Token: %s\n", token[:5])
-	fmt.Printf("Env token: %s\n", os.Getenv("GITHUB_REPOSITORY"))
+	repository := os.Getenv("GITHUB_REPOSITORY")
+	if repository == "" {
+		return fmt.Errorf("no repository: %w", ErrMissingInput)
+	}
 
-	return nil
+	ref := os.Getenv("GITHUB_REF")
+	if ref == "" {
+		return fmt.Errorf("no ref: %w", ErrMissingInput)
+	}
+
+	gitService := mortems.NewGitHubService(token, repository, ref)
+
+	mortemCollector := mortems.NewMortemCollector(gitService)
+
+	return mortemCollector.Collect()
 }
