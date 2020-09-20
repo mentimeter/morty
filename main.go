@@ -21,14 +21,7 @@ func run() error {
 		return errors.New("missing 'token'")
 	}
 
-	repo := githubactions.GetInput("repository")
-	if repo == "" {
-		return errors.New("missing 'repository'")
-	}
-
-	fmt.Printf("Repo: %s\n", repo)
-	fmt.Printf("Token: %s\n", token)
-
+	fmt.Printf("Token: %s\n", token[:5])
 	fmt.Printf("Env token: %s\n", os.Getenv("GITHUB_REPOSITORY"))
 
 	return nil
