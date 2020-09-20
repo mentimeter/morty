@@ -20,16 +20,16 @@ type FakeGitService struct {
 	commitNewBlobsReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetTreeEntriesStub        func() ([]*github.TreeEntry, error)
-	getTreeEntriesMutex       sync.RWMutex
-	getTreeEntriesArgsForCall []struct {
+	GetFilesStub        func() ([]*mortems.File, error)
+	getFilesMutex       sync.RWMutex
+	getFilesArgsForCall []struct {
 	}
-	getTreeEntriesReturns struct {
-		result1 []*github.TreeEntry
+	getFilesReturns struct {
+		result1 []*mortems.File
 		result2 error
 	}
-	getTreeEntriesReturnsOnCall map[int]struct {
-		result1 []*github.TreeEntry
+	getFilesReturnsOnCall map[int]struct {
+		result1 []*mortems.File
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -101,57 +101,57 @@ func (fake *FakeGitService) CommitNewBlobsReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeGitService) GetTreeEntries() ([]*github.TreeEntry, error) {
-	fake.getTreeEntriesMutex.Lock()
-	ret, specificReturn := fake.getTreeEntriesReturnsOnCall[len(fake.getTreeEntriesArgsForCall)]
-	fake.getTreeEntriesArgsForCall = append(fake.getTreeEntriesArgsForCall, struct {
+func (fake *FakeGitService) GetFiles() ([]*mortems.File, error) {
+	fake.getFilesMutex.Lock()
+	ret, specificReturn := fake.getFilesReturnsOnCall[len(fake.getFilesArgsForCall)]
+	fake.getFilesArgsForCall = append(fake.getFilesArgsForCall, struct {
 	}{})
-	fake.recordInvocation("GetTreeEntries", []interface{}{})
-	fake.getTreeEntriesMutex.Unlock()
-	if fake.GetTreeEntriesStub != nil {
-		return fake.GetTreeEntriesStub()
+	fake.recordInvocation("GetFiles", []interface{}{})
+	fake.getFilesMutex.Unlock()
+	if fake.GetFilesStub != nil {
+		return fake.GetFilesStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getTreeEntriesReturns
+	fakeReturns := fake.getFilesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeGitService) GetTreeEntriesCallCount() int {
-	fake.getTreeEntriesMutex.RLock()
-	defer fake.getTreeEntriesMutex.RUnlock()
-	return len(fake.getTreeEntriesArgsForCall)
+func (fake *FakeGitService) GetFilesCallCount() int {
+	fake.getFilesMutex.RLock()
+	defer fake.getFilesMutex.RUnlock()
+	return len(fake.getFilesArgsForCall)
 }
 
-func (fake *FakeGitService) GetTreeEntriesCalls(stub func() ([]*github.TreeEntry, error)) {
-	fake.getTreeEntriesMutex.Lock()
-	defer fake.getTreeEntriesMutex.Unlock()
-	fake.GetTreeEntriesStub = stub
+func (fake *FakeGitService) GetFilesCalls(stub func() ([]*mortems.File, error)) {
+	fake.getFilesMutex.Lock()
+	defer fake.getFilesMutex.Unlock()
+	fake.GetFilesStub = stub
 }
 
-func (fake *FakeGitService) GetTreeEntriesReturns(result1 []*github.TreeEntry, result2 error) {
-	fake.getTreeEntriesMutex.Lock()
-	defer fake.getTreeEntriesMutex.Unlock()
-	fake.GetTreeEntriesStub = nil
-	fake.getTreeEntriesReturns = struct {
-		result1 []*github.TreeEntry
+func (fake *FakeGitService) GetFilesReturns(result1 []*mortems.File, result2 error) {
+	fake.getFilesMutex.Lock()
+	defer fake.getFilesMutex.Unlock()
+	fake.GetFilesStub = nil
+	fake.getFilesReturns = struct {
+		result1 []*mortems.File
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeGitService) GetTreeEntriesReturnsOnCall(i int, result1 []*github.TreeEntry, result2 error) {
-	fake.getTreeEntriesMutex.Lock()
-	defer fake.getTreeEntriesMutex.Unlock()
-	fake.GetTreeEntriesStub = nil
-	if fake.getTreeEntriesReturnsOnCall == nil {
-		fake.getTreeEntriesReturnsOnCall = make(map[int]struct {
-			result1 []*github.TreeEntry
+func (fake *FakeGitService) GetFilesReturnsOnCall(i int, result1 []*mortems.File, result2 error) {
+	fake.getFilesMutex.Lock()
+	defer fake.getFilesMutex.Unlock()
+	fake.GetFilesStub = nil
+	if fake.getFilesReturnsOnCall == nil {
+		fake.getFilesReturnsOnCall = make(map[int]struct {
+			result1 []*mortems.File
 			result2 error
 		})
 	}
-	fake.getTreeEntriesReturnsOnCall[i] = struct {
-		result1 []*github.TreeEntry
+	fake.getFilesReturnsOnCall[i] = struct {
+		result1 []*mortems.File
 		result2 error
 	}{result1, result2}
 }
@@ -161,8 +161,8 @@ func (fake *FakeGitService) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.commitNewBlobsMutex.RLock()
 	defer fake.commitNewBlobsMutex.RUnlock()
-	fake.getTreeEntriesMutex.RLock()
-	defer fake.getTreeEntriesMutex.RUnlock()
+	fake.getFilesMutex.RLock()
+	defer fake.getFilesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

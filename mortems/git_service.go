@@ -12,7 +12,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GitService
 
 type GitService interface {
-	GetTreeEntries() ([]*github.TreeEntry, error)
+	GetFiles() ([]*File, error)
 	CommitNewBlobs([]*github.Blob) error
 }
 
@@ -23,7 +23,12 @@ type GitHub struct {
 	repository string
 }
 
-func NewGitHubService(ref, token, fullRepository string) GitService {
+type File struct {
+	TreeEntry *github.TreeEntry
+	Content   []byte
+}
+
+func NewGitHubService(token, fullRepository, ref string) GitService {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -35,7 +40,7 @@ func NewGitHubService(ref, token, fullRepository string) GitService {
 	return &GitHub{client, ref, repositoryArgs[0], repositoryArgs[1]}
 }
 
-func (g *GitHub) GetTreeEntries() ([]*github.TreeEntry, error) {
+func (g *GitHub) GetFiles() ([]*File, error) {
 	ctx := context.Background()
 
 	ref, _, err := g.client.Git.GetRef(ctx, g.owner, g.repository, g.ref)
@@ -53,7 +58,21 @@ func (g *GitHub) GetTreeEntries() ([]*github.TreeEntry, error) {
 		return nil, fmt.Errorf("could not get tree: %w", err)
 	}
 
-	return tree.Entries, nil
+	var files []*File
+
+	for _, entry := range tree.Entries {
+		if entry.GetType() == "blob" {
+			content, _, err := g.client.Git.GetBlobRaw(ctx, g.owner, g.repository, entry.GetSHA())
+			if err != nil {
+				return nil, fmt.Errorf("could not get blob content: %w", err)
+			}
+
+			file := &File{entry, content}
+			files = append(files, file)
+		}
+	}
+
+	return files, nil
 }
 
 func (g *GitHub) CommitNewBlobs([]*github.Blob) error {

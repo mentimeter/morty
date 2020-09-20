@@ -1,5 +1,7 @@
 package mortems
 
+import "fmt"
+
 type MortemCollector struct {
 	Git GitService
 }
@@ -9,9 +11,12 @@ func NewMortemCollector(gitService GitService) MortemCollector {
 }
 
 func (m MortemCollector) Collect() error {
-	_, err := m.Git.GetTreeEntries()
+	files, err := m.Git.GetFiles()
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(files)
+
 	return nil
 }
