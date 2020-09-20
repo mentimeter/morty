@@ -16,7 +16,7 @@ import (
 var _ = Describe("Mortems", func() {
 	var mortems MortemCollector
 	var gitService *mortemsfakes.FakeGitService
-	var treeEntryFixtures map[string][]*File
+	var treeEntryFixtures map[string][]*github.TreeEntry
 
 	BeforeEach(func() {
 		var err error
@@ -39,7 +39,7 @@ var _ = Describe("Mortems", func() {
 	})
 })
 
-func loadTreeEntryFixtures() (map[string][]*File, error) {
+func loadTreeEntryFixtures() (map[string][]*github.TreeEntry, error) {
 	fixturesDir := "testdata"
 
 	fixtureDirectories, err := ioutil.ReadDir(fixturesDir)
@@ -47,10 +47,10 @@ func loadTreeEntryFixtures() (map[string][]*File, error) {
 		return nil, err
 	}
 
-	fixtures := make(map[string][]*File)
+	fixtures := make(map[string][]*github.TreeEntry)
 
 	for _, dir := range fixtureDirectories {
-		var files []*File
+		var files []*github.TreeEntry
 
 		err := os.Chdir(filepath.Join(fixturesDir, dir.Name()))
 		if err != nil {
@@ -58,6 +58,9 @@ func loadTreeEntryFixtures() (map[string][]*File, error) {
 		}
 
 		err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
 			if info.IsDir() {
 				return nil
 			}
@@ -73,11 +76,9 @@ func loadTreeEntryFixtures() (map[string][]*File, error) {
 				return err
 			}
 
-			file := &File{
-				&github.TreeEntry{
-					Path: &path,
-				},
-				content,
+			file := &github.TreeEntry{
+				Path:    &path,
+				Content: github.String(string(content)),
 			}
 
 			// fmt.Printf("file: %s, content: %s\n", path, string(content))
