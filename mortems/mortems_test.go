@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-github/v32/github"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/types"
 	. "github.com/ostenbom/morty/mortems"
 	"github.com/ostenbom/morty/mortems/mortemsfakes"
 )
@@ -27,17 +28,55 @@ var _ = Describe("Mortems", func() {
 		mortems = NewMortemCollector(gitService)
 	})
 
-	Context("when the repository contains no post-mortems", func() {
+	Context("when the repository contains no post-mortems directory", func() {
 		BeforeEach(func() {
 			gitService.GetFilesReturns(treeEntryFixtures["no-mortems-dir"], nil)
 		})
 
-		It("Gets the TreeEntries from Git", func() {
+		It("creates the mortems directory", func() {
 			Expect(mortems.Collect()).To(Succeed())
+
 			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+
+			Expect(updateFiles).To(ContainElement(&github.TreeEntry{
+				Path: github.String("mortems"),
+				Mode: github.String("040000"),
+				Type: github.String("tree"),
+			}))
+
+			Expect(updateFiles).To(ContainElement(ContainFileSubstring("mortems/template.md", "<!-- Make sure that")))
 		})
 	})
 })
+
+func ContainFileSubstring(path, contentSubstring string) types.GomegaMatcher {
+	return And(
+		WithTransform(GetPath, Equal(path)),
+		WithTransform(GetMode, Equal("100644")),
+		WithTransform(GetType, Equal("blob")),
+		WithTransform(GetContent, ContainSubstring(contentSubstring)),
+	)
+}
+
+func GetPath(e *github.TreeEntry) string {
+	return *e.Path
+}
+
+func GetMode(e *github.TreeEntry) string {
+	return *e.Mode
+}
+
+func GetType(e *github.TreeEntry) string {
+	return *e.Type
+}
+
+func GetContent(e *github.TreeEntry) string {
+	return *e.Content
+}
 
 func loadTreeEntryFixtures() (map[string][]*github.TreeEntry, error) {
 	fixturesDir := "testdata"
