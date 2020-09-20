@@ -1,12 +1,13 @@
 name: 'Morty'
 description: 'Collects Your Post Mortems'
 inputs:
-  token:  # id of input
-    description: 'Github token ({{ github.token }}) to access the repository'
-    required: true
-  repository:
-    description: 'Github repository ({{ github.repository }}) to know which repo to access'
-    required: true
+  secrets:
+    token:  # id of input
+      description: 'Github token ({{ github.token }}) to access the repository'
+      required: true
+    repository:
+      description: 'Github repository ({{ github.repository }}) to know which repo to access'
+      required: true
 runs:
   using: docker
   image: Dockerfile

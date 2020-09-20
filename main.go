@@ -27,7 +27,9 @@ func run() error {
 	}
 
 	fmt.Printf("Repo: %s\n", repo)
-	fmt.Printf("Token: %s\n", token[:4])
+	fmt.Printf("Token: %s\n", token)
+
+	fmt.Printf("Env token: %s\n", os.Getenv("GITHUB_REPOSITORY"))
 
 	return nil
 }
