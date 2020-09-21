@@ -1,10 +1,8 @@
 package mortems_test
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
+	"encoding/json"
+	"time"
 
 	"github.com/google/go-github/v32/github"
 	. "github.com/onsi/ginkgo"
@@ -17,11 +15,11 @@ import (
 var _ = Describe("Mortems", func() {
 	var mortems MortemCollector
 	var gitService *mortemsfakes.FakeGitService
-	var treeEntryFixtures map[string][]*github.TreeEntry
+	var treeEntryFixtures map[string]*RepoFiles
 
 	BeforeEach(func() {
 		var err error
-		treeEntryFixtures, err = loadTreeEntryFixtures()
+		treeEntryFixtures, err = LoadTreeEntryFixtures()
 		Expect(err).NotTo(HaveOccurred())
 
 		gitService = new(mortemsfakes.FakeGitService)
@@ -41,8 +39,8 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/template.md", "<!-- The title of your incident. "))
-			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/template.md", "Global Love Chaos"))
+			Expect(updateFiles.GetFile("post-mortems/template.md")).To(BeFileWithSubstring("<!-- The title of your incident. "))
+			Expect(updateFiles.GetFile("post-mortems/template.md")).To(BeFileWithSubstring("Love Lost Globally"))
 		})
 
 		It("creates the post-mortem how-to/README", func() {
@@ -53,7 +51,7 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/README.md", "# How to create a new post-mortem"))
+			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("# How to create a new post-mortem"))
 		})
 	})
 
@@ -70,22 +68,47 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/README.md", "# How to create a new post-mortem"))
+			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("How to create a new post-mortem"))
 		})
 	})
+
+	Context("single post mortem", func() {
+		BeforeEach(func() {
+			gitService.GetFilesReturns(treeEntryFixtures["basic-single-mortem"], nil)
+		})
+
+		It("saves the correct metrics from the mortem", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			mortemEntries := GetMortemEntries(gitService)
+
+			Expect(mortemEntries).To(ContainElement(FirstMortem()))
+		})
+	})
+
+	Context("two post mortems in the same month", func() {
+		BeforeEach(func() {
+			gitService.GetFilesReturns(treeEntryFixtures["two-close-mortems"], nil)
+		})
+
+		It("saves the correct metrics from the mortem", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			mortemEntries := GetMortemEntries(gitService)
+
+			Expect(mortemEntries).To(ContainElement(FirstMortem()))
+			Expect(mortemEntries).To(ContainElement(SecondMortem()))
+		})
+	})
+
+	// TODO: For mortem that has changed its file name
 })
 
-func ContainFileWithSubstring(path, contentSubstring string) types.GomegaMatcher {
-	return ContainElement(And(
-		WithTransform(GetPath, Equal(path)),
+func BeFileWithSubstring(contentSubstring string) types.GomegaMatcher {
+	return And(
+		Not(BeNil()),
 		WithTransform(GetMode, Equal("100644")),
 		WithTransform(GetType, Equal("blob")),
 		WithTransform(GetContent, ContainSubstring(contentSubstring)),
-	))
-}
-
-func GetPath(e *github.TreeEntry) string {
-	return *e.Path
+	)
 }
 
 func GetMode(e *github.TreeEntry) string {
@@ -100,65 +123,58 @@ func GetContent(e *github.TreeEntry) string {
 	return *e.Content
 }
 
-func loadTreeEntryFixtures() (map[string][]*github.TreeEntry, error) {
-	fixturesDir := "testdata"
+func GetMortemEntries(gitService *mortemsfakes.FakeGitService) []MortemData {
+	Expect(gitService.GetFilesCallCount()).To(Equal(1))
+	Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
-	fixtureDirectories, err := ioutil.ReadDir(fixturesDir)
-	if err != nil {
-		return nil, err
+	updateFiles := gitService.CommitNewFilesArgsForCall(0)
+	dbFile := updateFiles.GetFile("mortems.json")
+	Expect(dbFile).NotTo(BeNil())
+
+	var mortemEntries []MortemData
+
+	dbFileBytes := []byte(dbFile.GetContent())
+	Expect(json.Unmarshal(dbFileBytes, &mortemEntries)).To(Succeed())
+
+	return mortemEntries
+}
+
+func FirstMortem() MortemData {
+	detectTime, err := time.ParseDuration("4m")
+	Expect(err).To(BeNil())
+	resolveTime, err := time.ParseDuration("6h14m")
+	Expect(err).To(BeNil())
+	totalDownTime, err := time.ParseDuration("6h28m")
+	Expect(err).To(BeNil())
+
+	return MortemData{
+		File:      "0001-first-mortem.md",
+		Title:     "Love Lost Globally: Jerry Develops Malicious App",
+		Owner:     "Morty Smith",
+		Date:      time.Date(2020, time.July, 1, 0, 0, 0, 0, time.UTC),
+		Severity:  "1",
+		Detect:    detectTime,
+		Resolve:   resolveTime,
+		TotalDown: totalDownTime,
 	}
+}
 
-	fixtures := make(map[string][]*github.TreeEntry)
+func SecondMortem() MortemData {
+	detectTime, err := time.ParseDuration("26h")
+	Expect(err).To(BeNil())
+	resolveTime, err := time.ParseDuration("3m")
+	Expect(err).To(BeNil())
+	totalDownTime, err := time.ParseDuration("26h3m")
+	Expect(err).To(BeNil())
 
-	for _, dir := range fixtureDirectories {
-		var files []*github.TreeEntry
-
-		err := os.Chdir(filepath.Join(fixturesDir, dir.Name()))
-		if err != nil {
-			return nil, fmt.Errorf("bad state! could not change fixture dir: %w", err)
-		}
-
-		err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-
-			f, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			defer f.Close()
-
-			content, err := ioutil.ReadAll(f)
-			if err != nil {
-				return err
-			}
-
-			file := &github.TreeEntry{
-				Path:    &path,
-				Content: github.String(string(content)),
-			}
-
-			// fmt.Printf("file: %s, content: %s\n", path, string(content))
-
-			files = append(files, file)
-
-			return nil
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		err = os.Chdir("../../")
-		if err != nil {
-			return nil, fmt.Errorf("bad state! could not change fixture dir: %w", err)
-		}
-
-		fixtures[dir.Name()] = files
+	return MortemData{
+		File:      "0002-second-mortem.md",
+		Title:     "Bad Parenting: Rick Clones Own Daughter",
+		Owner:     "Rick Sanchez",
+		Date:      time.Date(2020, time.July, 27, 0, 0, 0, 0, time.UTC),
+		Severity:  "1",
+		Detect:    detectTime,
+		Resolve:   resolveTime,
+		TotalDown: totalDownTime,
 	}
-
-	return fixtures, nil
 }

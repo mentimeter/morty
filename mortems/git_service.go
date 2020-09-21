@@ -13,8 +13,8 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GitService
 
 type GitService interface {
-	GetFiles() ([]*github.TreeEntry, error)
-	CommitNewFiles([]*github.TreeEntry) error
+	GetFiles() (*RepoFiles, error)
+	CommitNewFiles(*RepoFiles) error
 }
 
 type GitHub struct {
@@ -44,7 +44,7 @@ func NewGitHubService(token, fullRepository, ref string) GitService {
 	}
 }
 
-func (g *GitHub) GetFiles() ([]*github.TreeEntry, error) {
+func (g *GitHub) GetFiles() (*RepoFiles, error) {
 	ctx := context.Background()
 
 	ref, _, err := g.client.Git.GetRef(ctx, g.owner, g.repository, g.ref)
@@ -82,13 +82,13 @@ func (g *GitHub) GetFiles() ([]*github.TreeEntry, error) {
 		}
 	}
 
-	return files, nil
+	return &RepoFiles{files}, nil
 }
 
-func (g *GitHub) CommitNewFiles(updateEntries []*github.TreeEntry) error {
+func (g *GitHub) CommitNewFiles(updateEntries *RepoFiles) error {
 	ctx := context.Background()
 
-	newTree, _, err := g.client.Git.CreateTree(ctx, g.owner, g.repository, g.currentTree.GetSHA(), updateEntries)
+	newTree, _, err := g.client.Git.CreateTree(ctx, g.owner, g.repository, g.currentTree.GetSHA(), updateEntries.Files)
 	if err != nil {
 		return fmt.Errorf("could not create a new tree: %w", err)
 	}
@@ -96,14 +96,14 @@ func (g *GitHub) CommitNewFiles(updateEntries []*github.TreeEntry) error {
 	authorDate := time.Now()
 	author := &github.CommitAuthor{
 		Date:  &authorDate,
-		Name:  github.String("Morty Smith"),
-		Email: github.String("morty@your-post-mortems.now"),
+		Name:  g.currentCommit.Author.Name,
+		Email: g.currentCommit.Author.Email,
 	}
 
 	newCommitData := &github.Commit{
 		Author:    author,
 		Committer: author,
-		Message:   github.String("morty: collect your mortems"),
+		Message:   github.String("Auto-morty-cally analyse post-mortems"),
 		Tree:      newTree,
 		Parents:   []*github.Commit{g.currentCommit},
 	}

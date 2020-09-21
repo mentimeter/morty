@@ -1,6 +1,6 @@
 package mortems
 
-var postMortemTemplate = `<!--
+var templateContent = `<!--
 ^ The bits with these tags are just helpful comments, and won't show up on your post-mortem
 
 Post Mortem Agenda:
@@ -9,8 +9,8 @@ Post Mortem Agenda:
 Initial statement
 
   - Read aloud: "We're trying to prepare for a future where we are as stupid as we are today"
-  - During the meeting we will dissallow counterfactual phrases "would have" and "could have"
-  - When creating your timeline, try and stick to actual metrics rather than subjective human judegement
+  - During the meeting we will disallow counterfactual phrases "would have" and "could have"
+  - When creating your timeline, try and stick to actual metrics rather than subjective human judgement
 
 Reach an agreement on a complete timeline of the incident
 
@@ -25,7 +25,7 @@ Follow-up: set a reminder (maybe in slack) to follow up on the corrective action
 -->
 
 <!-- The title of your incident. Make sure the title is a h1 (single #)-->
-# Global Love Chaos: Jerry Develops Malicious App
+# Love Lost Globally: Jerry Develops Malicious App
 
 <!-- The date which the incident started on. The no letters after the numbers please 1, 2, 3 NOT 1st, 2nd, 3rd -->
 ## Date: July 1, 2020
@@ -50,10 +50,16 @@ Hostile aliens almost take over the planets water supply.
 
 <!-- Crucial metrics to agree on. Format: x unit[, x smaller_unit] -->
 <!-- Units can be seconds, minutes, hours, days. Use full unit (1 second, not 1s) -->
+<!-- Severity can be on your own scale, it is tracked as a category rather than a metric -->
+<!-- Could be: 1 = Service down completely, 2 = Service hindered for many users, 3 = Service hindered for some -->
 ## Metrics
-Time To Detect: 4 minutes
-Time To Resolve: 6 hours, 14 minutes
-Total Downtime: 6 hours, 28 minutes
+
+| Metric | Time |
+| --- | --- |
+| Severity | 1 |
+| Time To Detect | 4 minutes |
+| Time To Resolve | 6 hours, 14 minutes |
+| Total Downtime | 6 hours, 28 minutes | <!-- Detect + Resolve, Sanity check. -->
 
 ## Cause of the Problem
 
