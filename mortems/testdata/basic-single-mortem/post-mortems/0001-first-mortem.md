@@ -1,6 +1,4 @@
-package mortems
-
-var postMortemTemplate = `<!--
+<!--
 ^ The bits with these tags are just helpful comments, and won't show up on your post-mortem
 
 Post Mortem Agenda:
@@ -66,4 +64,3 @@ of alien app. Forehead tattoo documentation inadequate.
 * All house members must be debriefed before high risk aliens are brought into house [Rick]
   - Enforced using debrief document created in family-process repo
 * App review process to require 3 reviewers before release [Jerry]
-`

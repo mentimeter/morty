@@ -28,9 +28,9 @@ var _ = Describe("Mortems", func() {
 		mortems = NewMortemCollector(gitService)
 	})
 
-	Context("when the repository contains no template", func() {
+	Context("an empty, uninitialized repository", func() {
 		BeforeEach(func() {
-			gitService.GetFilesReturns(treeEntryFixtures["no-template"], nil)
+			gitService.GetFilesReturns(treeEntryFixtures["empty-repo"], nil)
 		})
 
 		It("creates the post-mortem template in the right place", func() {
@@ -41,8 +41,36 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles).To(ContainFileWithSubstring("mortems/template.md", "<!-- The title of your incident. "))
-			Expect(updateFiles).To(ContainFileWithSubstring("mortems/template.md", "Global Love Chaos"))
+			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/template.md", "<!-- The title of your incident. "))
+			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/template.md", "Global Love Chaos"))
+		})
+
+		It("creates the post-mortem how-to/README", func() {
+			Expect(mortems.Collect()).To(Succeed())
+
+			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/README.md", "# How to create a new post-mortem"))
+		})
+	})
+
+	Context("old version of mortems README", func() {
+		BeforeEach(func() {
+			gitService.GetFilesReturns(treeEntryFixtures["outdated-readme"], nil)
+		})
+
+		It("re-creates the post-mortem how-to/README", func() {
+			Expect(mortems.Collect()).To(Succeed())
+
+			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles).To(ContainFileWithSubstring("post-mortems/README.md", "# How to create a new post-mortem"))
 		})
 	})
 })

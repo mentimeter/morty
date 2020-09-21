@@ -22,8 +22,18 @@ func (m MortemCollector) Collect() error {
 
 	var newFiles []*github.TreeEntry
 
-	if !containsFile(files, "mortems/template.md") {
-		newFiles = append(newFiles, newTreeEntryFile("mortems/template.md", postMortemTemplate))
+	templatePath := "post-mortems/template.md"
+	templateFile := getFile(files, templatePath)
+
+	if templateFile == nil || templateFile.GetContent() != postMortemTemplate {
+		newFiles = append(newFiles, newTreeEntryFile(templatePath, postMortemTemplate))
+	}
+
+	howToPath := "post-mortems/README.md"
+	howToFile := getFile(files, howToPath)
+
+	if howToFile == nil || howToFile.GetContent() != howToPostMortem {
+		newFiles = append(newFiles, newTreeEntryFile(howToPath, howToPostMortem))
 	}
 
 	if len(newFiles) > 0 {
@@ -45,12 +55,12 @@ func newTreeEntryFile(path string, content string) *github.TreeEntry {
 	}
 }
 
-func containsFile(files []*github.TreeEntry, path string) bool {
+func getFile(files []*github.TreeEntry, path string) *github.TreeEntry {
 	for _, file := range files {
 		if file.GetPath() == path {
-			return true
+			return file
 		}
 	}
 
-	return false
+	return nil
 }
