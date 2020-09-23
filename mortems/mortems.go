@@ -55,6 +55,7 @@ func (m MortemCollector) Collect() error {
 
 	for _, file := range existingFiles.Files {
 		if strings.HasPrefix(file.GetPath(), "post-mortems/") &&
+			!strings.HasPrefix(file.GetPath(), "post-mortems/images/") &&
 			file.GetPath() != howToPath &&
 			file.GetPath() != templatePath {
 			modifiedDatabase = true
