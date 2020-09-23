@@ -13,17 +13,6 @@ type MortemCollector struct {
 	Git GitService
 }
 
-type MortemData struct {
-	File      string        `json:"file"`
-	Title     string        `json:"title"`
-	Owner     string        `json:"owner"`
-	Date      time.Time     `json:"date"`
-	Severity  string        `json:"severity"`
-	Detect    time.Duration `json:"detect"`
-	Resolve   time.Duration `json:"resolve"`
-	TotalDown time.Duration `json:"total_down"`
-}
-
 func NewMortemCollector(gitService GitService) MortemCollector {
 	return MortemCollector{gitService}
 }
