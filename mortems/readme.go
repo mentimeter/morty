@@ -2,14 +2,17 @@ package mortems
 
 import (
 	"fmt"
+	"sort"
 	"time"
 )
 
 func GenerateReadme(mortems []MortemData) string {
 	months := make(map[string][]MortemData)
 
+	monthYearFormat := "January 2006"
+
 	for _, mortem := range mortems {
-		month := mortem.Date.Format("January 2006")
+		month := mortem.Date.Format(monthYearFormat)
 		months[month] = append(months[month], mortem)
 	}
 
@@ -18,8 +21,20 @@ func GenerateReadme(mortems []MortemData) string {
 	readme += "## Overall Statistics\n"
 	readme += metricsTable(metrics(mortems))
 
-	for month, monthMortems := range months {
-		readme += monthSection(month, monthMortems)
+	sortedMonths := []string{}
+	for month := range months {
+		sortedMonths = append(sortedMonths, month)
+	}
+
+	sort.Slice(sortedMonths, func(i, j int) bool {
+		timeI, _ := time.Parse(monthYearFormat, sortedMonths[i])
+		timeJ, _ := time.Parse(monthYearFormat, sortedMonths[j])
+
+		return timeI.After(timeJ)
+	})
+
+	for _, month := range sortedMonths {
+		readme += monthSection(month, months[month])
 	}
 
 	return readme

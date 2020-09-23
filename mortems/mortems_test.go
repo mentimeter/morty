@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/google/go-github/v32/github"
+	. "github.com/mentimeter/morty/mortems"
+	"github.com/mentimeter/morty/mortems/mortemsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
-	. "github.com/mentimeter/morty/mortems"
-	"github.com/mentimeter/morty/mortems/mortemsfakes"
 )
 
 var _ = Describe("Mortems", func() {
