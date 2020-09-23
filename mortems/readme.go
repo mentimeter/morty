@@ -13,7 +13,7 @@ func GenerateReadme(mortems []MortemData) string {
 		months[month] = append(months[month], mortem)
 	}
 
-	readme := "# Incident Post-Mortems\n"
+	readme := "# Post-Mortems\n"
 
 	readme += "## Overall Statistics\n"
 	readme += metricsTable(metrics(mortems))
@@ -26,7 +26,7 @@ func GenerateReadme(mortems []MortemData) string {
 }
 
 func monthSection(month string, mortems []MortemData) string {
-	section := "## " + month + "\n"
+	section := "### " + month + "\n"
 	section += metricsTable(metrics(mortems))
 
 	for _, m := range mortems {
