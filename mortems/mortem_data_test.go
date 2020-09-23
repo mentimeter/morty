@@ -57,11 +57,25 @@ var _ = Describe("Mortem Content Parsing", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(sev).To(Equal("1"))
 		})
+
+		It("can parse the severity case-insensitive", func() {
+			sev, err := ParseSeverity("| severity | 1 |")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(sev).To(Equal("1"))
+		})
 	})
 
 	Describe("detection parsing", func() {
 		It("can parse the detection", func() {
 			detect, err := ParseDetect("| Time to Detect | 1 day, 3 hours, 6 minutes, 5 seconds |")
+			Expect(err).NotTo(HaveOccurred())
+			dur, err := time.ParseDuration("27h6m5s")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(detect).To(Equal(dur))
+		})
+
+		It("can parse the detection regardless of case", func() {
+			detect, err := ParseDetect("| Time to Detect | 1 Day, 3 Hours, 6 Minutes, 5 SeCoNds |")
 			Expect(err).NotTo(HaveOccurred())
 			dur, err := time.ParseDuration("27h6m5s")
 			Expect(err).NotTo(HaveOccurred())

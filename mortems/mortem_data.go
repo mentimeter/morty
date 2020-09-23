@@ -77,7 +77,7 @@ func NewMortemData(content, path string) (MortemData, error) {
 }
 
 func ParseTitle(content string) (string, error) {
-	re := regexp.MustCompile(`#\s(?P<Title>.+)`)
+	re := regexp.MustCompile(`(?i)# (?P<Title>.+)`)
 
 	title := re.FindStringSubmatch(content)
 	if title == nil {
@@ -88,7 +88,7 @@ func ParseTitle(content string) (string, error) {
 }
 
 func ParseOwner(content string) (string, error) {
-	re := regexp.MustCompile(`.*Owner: (?P<Owner>.+)`)
+	re := regexp.MustCompile(`(?i).*Owner: (?P<Owner>.+)`)
 
 	owner := re.FindStringSubmatch(content)
 	if owner == nil {
@@ -99,7 +99,7 @@ func ParseOwner(content string) (string, error) {
 }
 
 func ParseDate(content string) (time.Time, error) {
-	re := regexp.MustCompile(`.*Date: (?P<Date>.+)`)
+	re := regexp.MustCompile(`(?i).*Date: (?P<Date>.+)`)
 
 	dateStr := re.FindStringSubmatch(content)
 	if dateStr == nil {
@@ -121,7 +121,7 @@ func ParseDate(content string) (time.Time, error) {
 }
 
 func ParseSeverity(content string) (string, error) {
-	re := regexp.MustCompile(` *\| *Severity +\| *(.+) +\| *`)
+	re := regexp.MustCompile(`(?i) *\| *Severity +\| *(.+) +\| *`)
 
 	sev := re.FindStringSubmatch(content)
 	if sev == nil {
@@ -132,7 +132,7 @@ func ParseSeverity(content string) (string, error) {
 }
 
 func ParseDetect(content string) (time.Duration, error) {
-	re := regexp.MustCompile(` *\|.*Detect +\| *(.+) +\| *`)
+	re := regexp.MustCompile(`(?i) *\|.*Detect +\| *(.+) +\| *`)
 
 	detectMatches := re.FindStringSubmatch(content)
 	if detectMatches == nil {
@@ -150,7 +150,7 @@ func ParseDetect(content string) (time.Duration, error) {
 }
 
 func ParseResolve(content string) (time.Duration, error) {
-	re := regexp.MustCompile(` *\|.*Resolve +\| *(.+) +\| *`)
+	re := regexp.MustCompile(`(?i) *\|.*Resolve +\| *(.+) +\| *`)
 
 	resolveMatches := re.FindStringSubmatch(content)
 	if resolveMatches == nil {
@@ -168,7 +168,7 @@ func ParseResolve(content string) (time.Duration, error) {
 }
 
 func ParseDowntime(content string) (time.Duration, error) {
-	re := regexp.MustCompile(` *\|.*Downtime +\| *(.+) +\| *`)
+	re := regexp.MustCompile(`(?i) *\|.*Downtime +\| *(.+) +\| *`)
 
 	downtimeMatches := re.FindStringSubmatch(content)
 	if downtimeMatches == nil {
@@ -187,11 +187,12 @@ func ParseDowntime(content string) (time.Duration, error) {
 
 func stringToTime(timeStr string) (time.Duration, error) {
 	noSpaceDetect := strings.ReplaceAll(timeStr, " ", "")
-	timeGroups := strings.Split(noSpaceDetect, ",")
+	lowerCaseDetect := strings.ToLower(noSpaceDetect)
+	timeGroups := strings.Split(lowerCaseDetect, ",")
 
 	totalTime := time.Duration(0)
 	for _, t := range timeGroups {
-		re := regexp.MustCompile("[^0-9]*([0-9]+)[^0-9]*")
+		re := regexp.MustCompile(`[^0-9]*([0-9]+)[^0-9]*`)
 		goTimeString := ""
 
 		if strings.Contains(t, "day") {
