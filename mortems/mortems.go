@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-
-	"github.com/google/go-github/v32/github"
 )
 
 type MortemCollector struct {
@@ -46,7 +44,7 @@ func (m MortemCollector) Collect() error {
 		modifiedDatabase = true
 	}
 
-	var database []MortemData
+	var mortems []MortemData
 
 	// databaseBytes := []byte(databaseFile.GetContent())
 	//
@@ -66,11 +64,19 @@ func (m MortemCollector) Collect() error {
 				return fmt.Errorf("could not parse data from mortem %s: %w", file.GetPath(), err)
 			}
 
-			database = append(database, mortem)
+			mortems = append(mortems, mortem)
 		}
 	}
 
-	databaseBytes, err := json.Marshal(database)
+	readmePath := "README.md"
+	readmeFile := existingFiles.GetFile(readmePath)
+	readmeContent := GenerateReadme(mortems)
+
+	if readmeFile == nil || readmeFile.GetContent() != readmeContent {
+		newFiles.AddFile(readmePath, readmeContent)
+	}
+
+	databaseBytes, err := json.Marshal(mortems)
 	if err != nil {
 		return fmt.Errorf("could not marshal database to json: %w", err)
 	}
@@ -89,13 +95,4 @@ func (m MortemCollector) Collect() error {
 	}
 
 	return nil
-}
-
-func newTreeEntryFile(path string, content string) *github.TreeEntry {
-	return &github.TreeEntry{
-		Path:    github.String(path),
-		Mode:    github.String("100644"),
-		Type:    github.String("blob"),
-		Content: github.String(content),
-	}
 }

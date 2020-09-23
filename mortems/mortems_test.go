@@ -83,6 +83,16 @@ var _ = Describe("Mortems", func() {
 
 			Expect(mortemEntries).To(ContainElement(FirstMortem()))
 		})
+
+		It("creates the README in the root directory", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Love Lost Globally: Jerry Develops Malicious App"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("July 2020"))
+		})
 	})
 
 	Context("two post mortems in the same month", func() {
@@ -96,6 +106,43 @@ var _ = Describe("Mortems", func() {
 
 			Expect(mortemEntries).To(ContainElement(FirstMortem()))
 			Expect(mortemEntries).To(ContainElement(SecondMortem()))
+		})
+
+		It("creates the README in the root directory", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Love Lost Globally: Jerry Develops Malicious App"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Bad Parenting: Rick Clones Own Daughter"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("July 2020"))
+		})
+	})
+
+	Context("two post mortems on different months", func() {
+		BeforeEach(func() {
+			gitService.GetFilesReturns(treeEntryFixtures["different-month-mortems"], nil)
+		})
+
+		It("saves the correct metrics from the mortem", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			mortemEntries := GetMortemEntries(gitService)
+
+			Expect(mortemEntries).To(ContainElement(FirstMortem()))
+			Expect(mortemEntries).To(ContainElement(ThirdMortem()))
+		})
+
+		It("creates the README in the root directory", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			Expect(gitService.GetFilesCallCount()).To(Equal(1))
+			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
+
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Love Lost Globally: Jerry Develops Malicious App"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Christmas Lighting Causes Near Death"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("July 2020"))
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("August 2020"))
 		})
 	})
 
@@ -172,6 +219,26 @@ func SecondMortem() MortemData {
 		Title:    "Bad Parenting: Rick Clones Own Daughter",
 		Owner:    "Rick Sanchez",
 		Date:     time.Date(2020, time.July, 27, 0, 0, 0, 0, time.UTC),
+		Severity: "1",
+		Detect:   detectTime,
+		Resolve:  resolveTime,
+		Downtime: totalDownTime,
+	}
+}
+
+func ThirdMortem() MortemData {
+	detectTime, err := time.ParseDuration("2h1m")
+	Expect(err).To(BeNil())
+	resolveTime, err := time.ParseDuration("3s")
+	Expect(err).To(BeNil())
+	totalDownTime, err := time.ParseDuration("2h1m3s")
+	Expect(err).To(BeNil())
+
+	return MortemData{
+		File:     "post-mortems/0003-third-mortem.md",
+		Title:    "Christmas Lighting Causes Near Death",
+		Owner:    "Jerry Smith",
+		Date:     time.Date(2020, time.August, 6, 0, 0, 0, 0, time.UTC),
 		Severity: "1",
 		Detect:   detectTime,
 		Resolve:  resolveTime,
