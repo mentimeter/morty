@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/ostenbom/morty/mortems"
+	. "github.com/mentimeter/morty/mortems"
 )
 
 var _ = Describe("Mortem Content Parsing", func() {

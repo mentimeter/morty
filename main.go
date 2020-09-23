@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ostenbom/morty/mortems"
+	"github.com/mentimeter/morty/mortems"
 	"github.com/sethvargo/go-githubactions"
 )
 

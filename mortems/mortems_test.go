@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
-	. "github.com/ostenbom/morty/mortems"
-	"github.com/ostenbom/morty/mortems/mortemsfakes"
+	. "github.com/mentimeter/morty/mortems"
+	"github.com/mentimeter/morty/mortems/mortemsfakes"
 )
 
 var _ = Describe("Mortems", func() {

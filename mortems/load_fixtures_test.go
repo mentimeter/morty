@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/google/go-github/v32/github"
-	. "github.com/ostenbom/morty/mortems"
+	. "github.com/mentimeter/morty/mortems"
 )
 
 func LoadTreeEntryFixtures() (map[string]*RepoFiles, error) {

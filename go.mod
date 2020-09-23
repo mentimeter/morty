@@ -1,4 +1,4 @@
-module github.com/ostenbom/morty
+module github.com/mentimeter/morty
 
 go 1.14
 

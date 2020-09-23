@@ -4,7 +4,7 @@ package mortemsfakes
 import (
 	"sync"
 
-	"github.com/ostenbom/morty/mortems"
+	"github.com/mentimeter/morty/mortems"
 )
 
 type FakeGitService struct {
