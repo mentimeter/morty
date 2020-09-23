@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/google/go-github/v32/github"
 )
@@ -62,7 +61,7 @@ func (m MortemCollector) Collect() error {
 			file.GetPath() != templatePath {
 			modifiedDatabase = true
 
-			mortem, err := ParseMortem(file.GetContent())
+			mortem, err := NewMortemData(file.GetContent(), file.GetPath())
 			if err != nil {
 				return fmt.Errorf("could not parse data from mortem %s: %w", file.GetPath(), err)
 			}
@@ -90,34 +89,6 @@ func (m MortemCollector) Collect() error {
 	}
 
 	return nil
-}
-
-func ParseMortem(mortem string) (MortemData, error) {
-	detectTime, err := time.ParseDuration("4m")
-	if err != nil {
-		return MortemData{}, err
-	}
-
-	resolveTime, err := time.ParseDuration("6h14m")
-	if err != nil {
-		return MortemData{}, err
-	}
-
-	totalDownTime, err := time.ParseDuration("6h28m")
-	if err != nil {
-		return MortemData{}, err
-	}
-
-	return MortemData{
-		File:      "0001-first-mortem.md",
-		Title:     "Love Lost Globally: Jerry Develops Malicious App",
-		Owner:     "Morty Smith",
-		Date:      time.Date(2020, time.July, 1, 0, 0, 0, 0, time.UTC),
-		Severity:  "1",
-		Detect:    detectTime,
-		Resolve:   resolveTime,
-		TotalDown: totalDownTime,
-	}, nil
 }
 
 func newTreeEntryFile(path string, content string) *github.TreeEntry {

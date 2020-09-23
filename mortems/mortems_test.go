@@ -148,14 +148,14 @@ func FirstMortem() MortemData {
 	Expect(err).To(BeNil())
 
 	return MortemData{
-		File:      "0001-first-mortem.md",
-		Title:     "Love Lost Globally: Jerry Develops Malicious App",
-		Owner:     "Morty Smith",
-		Date:      time.Date(2020, time.July, 1, 0, 0, 0, 0, time.UTC),
-		Severity:  "1",
-		Detect:    detectTime,
-		Resolve:   resolveTime,
-		TotalDown: totalDownTime,
+		File:     "post-mortems/0001-first-mortem.md",
+		Title:    "Love Lost Globally: Jerry Develops Malicious App",
+		Owner:    "Morty Smith",
+		Date:     time.Date(2020, time.July, 1, 0, 0, 0, 0, time.UTC),
+		Severity: "1",
+		Detect:   detectTime,
+		Resolve:  resolveTime,
+		Downtime: totalDownTime,
 	}
 }
 
@@ -168,13 +168,13 @@ func SecondMortem() MortemData {
 	Expect(err).To(BeNil())
 
 	return MortemData{
-		File:      "0002-second-mortem.md",
-		Title:     "Bad Parenting: Rick Clones Own Daughter",
-		Owner:     "Rick Sanchez",
-		Date:      time.Date(2020, time.July, 27, 0, 0, 0, 0, time.UTC),
-		Severity:  "1",
-		Detect:    detectTime,
-		Resolve:   resolveTime,
-		TotalDown: totalDownTime,
+		File:     "post-mortems/0002-second-mortem.md",
+		Title:    "Bad Parenting: Rick Clones Own Daughter",
+		Owner:    "Rick Sanchez",
+		Date:     time.Date(2020, time.July, 27, 0, 0, 0, 0, time.UTC),
+		Severity: "1",
+		Detect:   detectTime,
+		Resolve:  resolveTime,
+		Downtime: totalDownTime,
 	}
 }
