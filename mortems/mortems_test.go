@@ -51,7 +51,13 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("# How to create a new post-mortem"))
+			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("# Post Mortem Action Plan"))
+		})
+
+		It("links to how-to from README", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("#### [How to Post-Mortem](/post-mortems)"))
 		})
 	})
 
@@ -68,7 +74,7 @@ var _ = Describe("Mortems", func() {
 			Expect(gitService.CommitNewFilesCallCount()).To(Equal(1))
 
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("How to create a new post-mortem"))
+			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("# Post Mortem Action Plan"))
 		})
 	})
 

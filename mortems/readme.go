@@ -18,6 +18,7 @@ func GenerateReadme(mortems []MortemData) string {
 
 	readme := "# Post-Mortems\n"
 
+	readme += "#### [How to Post-Mortem](/post-mortems)\n"
 	readme += "## Overall Statistics\n"
 	readme += metricsTable(metrics(mortems))
 
