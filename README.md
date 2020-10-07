@@ -1,7 +1,7 @@
 <p align="center">
   <img alt="logo" src="https://user-images.githubusercontent.com/7828615/95340563-9b261880-08b5-11eb-86f7-156d6c29b44d.png" height="150" />
   <h3 align="center">Morty</h3>
-  <p align="center">Turns a GitHub Repository into an organized collection of post-mortems</p>
+  <p align="center">An action that turns a GitHub Repository into an organized collection of post-mortems</p>
 </p>
 
 ---
@@ -12,11 +12,11 @@
 
 ~ _From the "Emergency Response" Chapter in "Site Reliability Engineering: How Google Runs Production Systems"_
 
+**Check out the [example repository](https://github.com/mentimeter/example-post-mortems) to see what it's like!**
+
 Morty is a GitHub Action that gives you an overview of your post-mortems. It parses your post-mortems _written in markdown_, and gives you some friendly advice on running good post-mortems on the way 📈
 
-![morty-example](https://user-images.githubusercontent.com/7828615/95351519-98c9bb80-08c1-11eb-9d3c-7e8502ff7d49.png)
-
-**Check out the [example repository](https://github.com/mentimeter/example-post-mortems) to see what it's like!**
+![morty-example](https://user-images.githubusercontent.com/7828615/95354012-3b833980-08c4-11eb-83c0-845a8523d036.png)
 
 ## Getting started
 
