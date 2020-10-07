@@ -12,13 +12,15 @@
 
 ~ _From the "Emergency Response" Chapter in "Site Reliability Engineering: How Google Runs Production Systems"_
 
-Morty is a GitHub Action that gives you an overview of your post-mortems.
+Morty is a GitHub Action that gives you an overview of your post-mortems. It parses your post-mortems _written in markdown_, and gives you some friendly advice on running good post-mortems on the way 📈
 
-Check out the [example repository](https://github.com/mentimeter/example-post-mortems) to see what it's like!
+![morty-example](https://user-images.githubusercontent.com/7828615/95351519-98c9bb80-08c1-11eb-9d3c-7e8502ff7d49.png)
+
+**Check out the [example repository](https://github.com/mentimeter/example-post-mortems) to see what it's like!**
 
 ## Getting started
 
-Install the action in a (new) repository. You can fork one from a [template](https://github.com/mentimeter/example-post-mortems) if you'd like!
+Install the action in a (new) repository. You can create one from a [template repository](https://github.com/mentimeter/example-post-mortems) if you'd like!
 
 To install the action, add a new workflow file `.github/workflows/morty.yml`. It should contain something like this:
 
