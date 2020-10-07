@@ -16,6 +16,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Oh jeez: %s\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Println("Post-mortems successfully parsed and organized")
 }
 
 func run() error {
