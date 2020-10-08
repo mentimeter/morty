@@ -1,9 +1,8 @@
 module github.com/mentimeter/morty
 
-go 1.14
+go 1.15
 
 require (
-	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v32 v32.1.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3 // indirect
 	github.com/onsi/ginkgo v1.8.0
