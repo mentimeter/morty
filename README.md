@@ -34,7 +34,7 @@ jobs:
 
     steps:
     - name: Organize mortems
-      uses: mentimeter/morty@master # Add Vx later
+      uses: mentimeter/morty@V1
       with:
         token: ${{ github.token }}
 ```
