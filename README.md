@@ -34,7 +34,7 @@ jobs:
 
     steps:
     - name: Organize mortems
-      uses: mentimeter/morty@V1
+      uses: mentimeter/morty@v1
       with:
         token: ${{ github.token }}
 ```

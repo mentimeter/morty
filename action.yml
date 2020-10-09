@@ -1,7 +1,10 @@
-name: 'Morty'
-description: 'Collects Your Post Mortems'
+name: 'Morty Post Mortems'
+description: 'Turns a repository into an organized collection of post-mortems'
+branding:
+  icon: archive
+  color: blue
 inputs:
-  token:  # id of input
+  token:
     description: 'Github token ({{ github.token }}) to access the repository'
     required: true
 runs:
