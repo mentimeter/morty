@@ -125,7 +125,7 @@ func ParseSeverity(content string) (string, error) {
 
 	sev := re.FindStringSubmatch(content)
 	if sev == nil {
-		return "", ErrNoOwner
+		return "", ErrNoSeverity
 	}
 
 	return sev[1], nil
@@ -136,7 +136,7 @@ func ParseDetect(content string) (time.Duration, error) {
 
 	detectMatches := re.FindStringSubmatch(content)
 	if detectMatches == nil {
-		return 0, ErrNoOwner
+		return 0, ErrNoDetect
 	}
 
 	detectString := detectMatches[1]
@@ -154,7 +154,7 @@ func ParseResolve(content string) (time.Duration, error) {
 
 	resolveMatches := re.FindStringSubmatch(content)
 	if resolveMatches == nil {
-		return 0, ErrNoOwner
+		return 0, ErrNoResolve
 	}
 
 	resolveString := resolveMatches[1]
@@ -172,7 +172,7 @@ func ParseDowntime(content string) (time.Duration, error) {
 
 	downtimeMatches := re.FindStringSubmatch(content)
 	if downtimeMatches == nil {
-		return 0, ErrNoOwner
+		return 0, ErrNoDowntime
 	}
 
 	downtimeString := downtimeMatches[1]
