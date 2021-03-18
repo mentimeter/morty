@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
+	. "github.com/mentimeter/morty/mortems"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/mentimeter/morty/mortems"
 )
 
 var _ = Describe("Mortem Content Parsing", func() {
@@ -78,6 +78,14 @@ var _ = Describe("Mortem Content Parsing", func() {
 			detect, err := ParseDetect("| Time to Detect | 1 Day, 3 Hours, 6 Minutes, 5 SeCoNds |")
 			Expect(err).NotTo(HaveOccurred())
 			dur, err := time.ParseDuration("27h6m5s")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(detect).To(Equal(dur))
+		})
+
+		It("can parse the detection regardless of case", func() {
+			detect, err := ParseDetect("| Time To Detect  | 30 minutes          |")
+			Expect(err).NotTo(HaveOccurred())
+			dur, err := time.ParseDuration("30m")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(detect).To(Equal(dur))
 		})

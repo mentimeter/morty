@@ -7,15 +7,15 @@ import (
 )
 
 type MortemCollector struct {
-	Git GitService
+	Repo RepoFileService
 }
 
-func NewMortemCollector(gitService GitService) MortemCollector {
-	return MortemCollector{gitService}
+func NewMortemCollector(fileService RepoFileService) MortemCollector {
+	return MortemCollector{fileService}
 }
 
 func (m MortemCollector) Collect() error {
-	existingFiles, err := m.Git.GetFiles()
+	existingFiles, err := m.Repo.GetFiles()
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (m MortemCollector) Collect() error {
 	}
 
 	if newFiles.Size() > 0 {
-		err := m.Git.CommitNewFiles(&newFiles)
+		err := m.Repo.CommitNewFiles(&newFiles)
 		if err != nil {
 			return fmt.Errorf("could not commit new files: %w", err)
 		}

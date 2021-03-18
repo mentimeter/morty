@@ -176,4 +176,4 @@ func (fake *FakeGitService) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ mortems.GitService = new(FakeGitService)
+var _ mortems.RepoFileService = new(FakeGitService)
