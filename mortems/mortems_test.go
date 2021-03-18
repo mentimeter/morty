@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/go-github/v32/github"
 	. "github.com/mentimeter/morty/mortems"
 	"github.com/mentimeter/morty/mortems/mortemsfakes"
 	. "github.com/onsi/ginkgo"
@@ -164,16 +163,16 @@ func BeFileWithSubstring(contentSubstring string) types.GomegaMatcher {
 	)
 }
 
-func GetMode(e *github.TreeEntry) string {
-	return *e.Mode
+func GetMode(e *File) string {
+	return e.Mode
 }
 
-func GetType(e *github.TreeEntry) string {
-	return *e.Type
+func GetType(e *File) string {
+	return e.Type
 }
 
-func GetContent(e *github.TreeEntry) string {
-	return *e.Content
+func GetContent(e *File) string {
+	return e.Content
 }
 
 func GetMortemEntries(gitService *mortemsfakes.FakeGitService) []MortemData {

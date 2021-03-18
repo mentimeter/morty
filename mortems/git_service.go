@@ -10,9 +10,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GitService
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RepoFileService
 
-type GitService interface {
+type RepoFileService interface {
 	GetFiles() (*RepoFiles, error)
 	CommitNewFiles(*RepoFiles) error
 }
@@ -27,7 +27,7 @@ type GitHub struct {
 	currentRef    *github.Reference
 }
 
-func NewGitHubService(token, fullRepository, ref string) GitService {
+func NewGitHubService(token, fullRepository, ref string) RepoFileService {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -68,7 +68,7 @@ func (g *GitHub) GetFiles() (*RepoFiles, error) {
 
 	g.currentTree = tree
 
-	var files []*github.TreeEntry
+	var files []*File
 
 	for _, entry := range tree.Entries {
 		if entry.GetType() == "blob" {
@@ -78,7 +78,15 @@ func (g *GitHub) GetFiles() (*RepoFiles, error) {
 			}
 
 			entry.Content = github.String(string(content))
-			files = append(files, entry)
+
+			file := &File{
+				Path:    *entry.Path,
+				Mode:    *entry.Mode,
+				Type:    "blob",
+				Content: string(content),
+			}
+
+			files = append(files, file)
 		}
 	}
 
@@ -88,7 +96,7 @@ func (g *GitHub) GetFiles() (*RepoFiles, error) {
 func (g *GitHub) CommitNewFiles(updateEntries *RepoFiles) error {
 	ctx := context.Background()
 
-	newTree, _, err := g.client.Git.CreateTree(ctx, g.owner, g.repository, g.currentTree.GetSHA(), updateEntries.Files)
+	newTree, _, err := g.client.Git.CreateTree(ctx, g.owner, g.repository, g.currentTree.GetSHA(), updateEntries.ToTreeEntries())
 	if err != nil {
 		return fmt.Errorf("could not create a new tree: %w", err)
 	}

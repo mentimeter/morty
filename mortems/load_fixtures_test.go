@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/go-github/v32/github"
 	. "github.com/mentimeter/morty/mortems"
 )
 
@@ -21,7 +20,7 @@ func LoadTreeEntryFixtures() (map[string]*RepoFiles, error) {
 	fixtures := make(map[string]*RepoFiles)
 
 	for _, dir := range fixtureDirectories {
-		var files []*github.TreeEntry
+		var files []*File
 
 		err := os.Chdir(filepath.Join(fixturesDir, dir.Name()))
 		if err != nil {
@@ -47,9 +46,9 @@ func LoadTreeEntryFixtures() (map[string]*RepoFiles, error) {
 				return err
 			}
 
-			file := &github.TreeEntry{
-				Path:    &path,
-				Content: github.String(string(content)),
+			file := &File{
+				Path:    path,
+				Content: string(content),
 			}
 
 			// fmt.Printf("file: %s, content: %s\n", path, string(content))
