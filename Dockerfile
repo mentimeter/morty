@@ -6,6 +6,6 @@ WORKDIR /src
 COPY . .
 
 # Compile the action
-RUN go build -o morty
+RUN go build -o /bin/action
 
-ENTRYPOINT ["morty"]
+ENTRYPOINT ["/bin/action"]
