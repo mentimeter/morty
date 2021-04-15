@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/google/go-github/v32 v32.1.0
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3 // indirect
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.9.0
 	github.com/sethvargo/go-githubactions v0.2.0
