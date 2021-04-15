@@ -1,10 +1,14 @@
 package mortems
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"strings"
 )
+
+//go:embed install_morty
+var installScriptContent string
 
 type MortemCollector struct {
 	Repo RepoFileService
@@ -14,13 +18,13 @@ func NewMortemCollector(fileService RepoFileService) MortemCollector {
 	return MortemCollector{fileService}
 }
 
-func (m MortemCollector) Collect() error {
+func (m MortemCollector) Check() (RepoFiles, error) {
+	newFiles := RepoFiles{}
+
 	existingFiles, err := m.Repo.GetFiles()
 	if err != nil {
-		return err
+		return RepoFiles{}, err
 	}
-
-	newFiles := RepoFiles{}
 
 	templatePath := "post-mortems/template.md"
 	templateFile := existingFiles.GetFile(templateContent)
@@ -34,6 +38,13 @@ func (m MortemCollector) Collect() error {
 
 	if howToFile == nil || howToFile.GetContent() != howToContent {
 		newFiles.AddFile(howToPath, howToContent)
+	}
+
+	installScriptPath := "install_morty"
+	installScriptFile := existingFiles.GetFile(installScriptPath)
+
+	if installScriptFile == nil || installScriptFile.GetContent() != installScriptContent {
+		newFiles.AddFile(installScriptPath, installScriptContent)
 	}
 
 	databasePath := "mortems.json"
@@ -62,7 +73,7 @@ func (m MortemCollector) Collect() error {
 
 			mortem, err := NewMortemData(file.GetContent(), file.GetPath())
 			if err != nil {
-				return fmt.Errorf("could not parse data from mortem %s: %w", file.GetPath(), err)
+				return RepoFiles{}, fmt.Errorf("could not parse data from mortem %s: %w", file.GetPath(), err)
 			}
 
 			mortems = append(mortems, mortem)
@@ -79,13 +90,23 @@ func (m MortemCollector) Collect() error {
 
 	databaseBytes, err := json.Marshal(mortems)
 	if err != nil {
-		return fmt.Errorf("could not marshal database to json: %w", err)
+		return RepoFiles{}, fmt.Errorf("could not marshal database to json: %w", err)
 	}
 
 	databaseString := string(databaseBytes)
 
 	if modifiedDatabase {
 		newFiles.AddFile(databasePath, databaseString)
+	}
+
+	return newFiles, nil
+
+}
+
+func (m MortemCollector) Collect() error {
+	newFiles, err := m.Check()
+	if err != nil {
+		return fmt.Errorf("could not check files, there might be a parsing error: %w", err)
 	}
 
 	if newFiles.Size() > 0 {

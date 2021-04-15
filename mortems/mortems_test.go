@@ -53,6 +53,12 @@ var _ = Describe("Mortems", func() {
 			Expect(updateFiles.GetFile("post-mortems/README.md")).To(BeFileWithSubstring("# Post Mortem Action Plan"))
 		})
 
+		It("creates the local morty install script", func() {
+			Expect(mortems.Collect()).To(Succeed())
+			updateFiles := gitService.CommitNewFilesArgsForCall(0)
+			Expect(updateFiles.GetFile("install_morty")).To(BeFileWithSubstring("wget"))
+		})
+
 		It("links to how-to from README", func() {
 			Expect(mortems.Collect()).To(Succeed())
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)

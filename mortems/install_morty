@@ -1,0 +1,4 @@
+#!/bin/sh
+
+wget https://github.com/mentimeter/morty/releases/latest/download/morty-darwin
+move morty-darwin morty

@@ -26,15 +26,31 @@ To install the action, add a new workflow file `.github/workflows/morty.yml`. It
 
 ```
 name: Morty
-on: [push, pull_request]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   morty:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Organize mortems
+    - name: Check that post mortems look good
       uses: mentimeter/morty@v1
+      if: ${{ github.event_name == 'pull_request' }}
+      run: morty git check
+      with:
+        token: ${{ github.token }}
+    - name: Check post mortems and commit statistics
+      uses: mentimeter/morty@v1
+      if: ${{ github.event_name == 'push' }}
+      run: morty git
       with:
         token: ${{ github.token }}
 ```
