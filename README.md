@@ -42,17 +42,17 @@ jobs:
 
     steps:
     - name: Check that post mortems look good
-      uses: mentimeter/morty@v1
+      uses: mentimeter/morty@master
       if: ${{ github.event_name == 'pull_request' }}
-      run: morty git check
       with:
         token: ${{ github.token }}
+        args: git check
     - name: Check post mortems and commit statistics
-      uses: mentimeter/morty@v1
+      uses: mentimeter/morty@master
       if: ${{ github.event_name == 'push' }}
-      run: morty git
       with:
         token: ${{ github.token }}
+        args: git
 ```
 
 The easiest way to make a new post-mortem is to make a copy of the template that morty makes for you `post-mortems/template.md`.
