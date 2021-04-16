@@ -69,8 +69,8 @@ You can add datadog reporting of your metrics by adding `DD_API_KEY` and `DD_APP
         token: ${{ github.token }}
         args: git
       env:
-        DD_APP_KEY: xxxAppKey
-        DD_API_KEY: xxxApiKey
+        DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+        DD_API_KEY: ${{ secrets.DD_API_KEY }}
 ```
 
 ## Why morty / post mortems as a repository?
