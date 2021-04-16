@@ -1,4 +1,4 @@
 #!/bin/sh
 
 wget https://github.com/mentimeter/morty/releases/latest/download/morty_darwin_amd64
-move morty-darwin morty
+mv morty_darwin_amd64 morty

@@ -1,6 +1,7 @@
 package mortems
 
 import (
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -53,7 +54,11 @@ func (s *LocalFileService) GetFiles() (*RepoFiles, error) {
 			return err
 		}
 
-		files.AddFile(relativePath, string(content))
+		if info.Mode() == 0755 {
+			files.AddExecutableFile(relativePath, string(content))
+		} else {
+			files.AddFile(relativePath, string(content))
+		}
 
 		return nil
 	})
@@ -71,7 +76,14 @@ func (s *LocalFileService) GetFiles() (*RepoFiles, error) {
 
 func (s *LocalFileService) CommitNewFiles(files *RepoFiles) error {
 	for _, file := range files.Files {
-		err := os.WriteFile(path.Join(s.repoPath, file.GetPath()), []byte(file.GetContent()), 0644)
+		modeStr := strings.TrimPrefix(file.GetMode(), "10")
+		var mode fs.FileMode
+		if strings.Contains(modeStr, "755") {
+			mode = 0755
+		} else {
+			mode = 0644
+		}
+		err := os.WriteFile(path.Join(s.repoPath, file.GetPath()), []byte(file.GetContent()), mode)
 		if err != nil {
 			return err
 		}

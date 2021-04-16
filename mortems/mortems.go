@@ -44,7 +44,7 @@ func (m MortemCollector) Check() (RepoFiles, error) {
 	installScriptFile := existingFiles.GetFile(installScriptPath)
 
 	if installScriptFile == nil || installScriptFile.GetContent() != installScriptContent {
-		newFiles.AddFile(installScriptPath, installScriptContent)
+		newFiles.AddExecutableFile(installScriptPath, installScriptContent)
 	}
 
 	databasePath := "mortems.json"

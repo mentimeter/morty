@@ -63,6 +63,16 @@ var _ = Describe("Mortems", func() {
 		Expect(mortemFiles.GetFile(fullReadmePath)).To(BeFileWithSubstring("July 2020"))
 		Expect(mortemFiles.GetFile(fullReadmePath)).To(BeFileWithSubstring("August 2020"))
 	})
+
+	It("creates the local morty install script", func() {
+		Expect(mortems.Collect()).To(Succeed())
+
+		mortemFiles, err := localFileService.GetFiles()
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(mortemFiles.GetFile("install_morty").GetContent()).To(ContainSubstring("wget"))
+		Expect(mortemFiles.GetFile("install_morty").GetMode()).To(Equal("100755"))
+	})
 })
 
 func copyDir(source, dest string) (string, error) {

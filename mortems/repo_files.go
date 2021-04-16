@@ -1,6 +1,6 @@
 package mortems
 
-import "github.com/google/go-github/v32/github"
+import "github.com/google/go-github/v35/github"
 
 type RepoFiles struct {
 	Files []*File
@@ -31,6 +31,16 @@ func (r *RepoFiles) AddFile(path, content string) {
 	file := &File{
 		Path:    path,
 		Mode:    "100644",
+		Type:    "blob",
+		Content: content,
+	}
+	r.Files = append(r.Files, file)
+}
+
+func (r *RepoFiles) AddExecutableFile(path, content string) {
+	file := &File{
+		Path:    path,
+		Mode:    "100755",
 		Type:    "blob",
 		Content: content,
 	}

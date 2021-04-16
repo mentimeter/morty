@@ -3,7 +3,7 @@ module github.com/mentimeter/morty
 go 1.16
 
 require (
-	github.com/google/go-github/v32 v32.1.0
+	github.com/google/go-github/v35 v35.0.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.9.0

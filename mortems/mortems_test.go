@@ -56,7 +56,8 @@ var _ = Describe("Mortems", func() {
 		It("creates the local morty install script", func() {
 			Expect(mortems.Collect()).To(Succeed())
 			updateFiles := gitService.CommitNewFilesArgsForCall(0)
-			Expect(updateFiles.GetFile("install_morty")).To(BeFileWithSubstring("wget"))
+			Expect(updateFiles.GetFile("install_morty").GetContent()).To(ContainSubstring("wget"))
+			Expect(updateFiles.GetFile("install_morty").GetMode()).To(Equal("100755"))
 		})
 
 		It("links to how-to from README", func() {
