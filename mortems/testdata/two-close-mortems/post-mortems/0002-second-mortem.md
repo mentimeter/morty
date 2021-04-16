@@ -15,7 +15,7 @@
 
 | Metric | Time |
 | --- | --- |
-| Severity | 1 |
+| Severity | 2 |
 | Time To Detect | 1 day, 2 hours |
 | Time To Resolve | 3 minutes |
 | Total Downtime | 1 day, 2 hours, 3 minutes | <!-- Detect + Resolve, Sanity check. -->

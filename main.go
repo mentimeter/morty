@@ -20,6 +20,10 @@ func main() {
 		if err := runCheck(); err != nil {
 			log.Fatalf("Oh jeez: %s\n", err)
 		}
+	} else if os.Args[1] == "local" {
+		if err := runLocal(); err != nil {
+			log.Fatalf("Oh jeez: %s\n", err)
+		}
 	} else if len(os.Args) == 3 && os.Args[1] == "git" && os.Args[2] == "check" {
 		if err := runGitCheck(); err != nil {
 			log.Fatalf("Oh jeez: %s\n", err)
@@ -61,7 +65,19 @@ func runGitCollect() error {
 	}
 
 	gitService := mortems.NewGitHubService(token, repository, ref)
-	mortemCollector := mortems.NewMortemCollector(gitService)
+
+	var mortemCollector mortems.MortemCollector
+
+	_, ddApiExists := os.LookupEnv("DD_API_KEY")
+	_, ddAppExists := os.LookupEnv("DD_APP_KEY")
+	if ddApiExists && ddAppExists {
+		ddService := mortems.NewDatadogReporter()
+		mortemCollector = mortems.NewMortemReportingCollector(gitService, ddService)
+	} else {
+		mortemCollector = mortems.NewMortemCollector(gitService)
+
+	}
+
 	return mortemCollector.Collect()
 }
 
@@ -86,6 +102,28 @@ func runGitCheck() error {
 	mortemCollector := mortems.NewMortemCollector(gitService)
 	_, err := mortemCollector.Check()
 	return err
+}
+
+func runLocal() error {
+	repoPath, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not get wd: %w", err)
+	}
+
+	fileService := mortems.NewLocalFileService(repoPath)
+
+	var mortemCollector mortems.MortemCollector
+
+	_, ddApiExists := os.LookupEnv("DD_API_KEY")
+	_, ddAppExists := os.LookupEnv("DD_APP_KEY")
+	if ddApiExists && ddAppExists {
+		ddService := mortems.NewDatadogReporter()
+		mortemCollector = mortems.NewMortemReportingCollector(fileService, ddService)
+	} else {
+		mortemCollector = mortems.NewMortemCollector(fileService)
+
+	}
+	return mortemCollector.Collect()
 }
 
 func runCheck() error {

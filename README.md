@@ -58,6 +58,21 @@ jobs:
 The easiest way to make a new post-mortem is to make a copy of the template that morty makes for you `post-mortems/template.md`.
 There are also some more instructions there to help you get going.
 
+## Reporting
+
+You can add datadog reporting of your metrics by adding `DD_API_KEY` and `DD_APP_KEY` env variables to your job:
+```
+    - name: Check post mortems and commit statistics and report metrics
+      uses: mentimeter/morty@master
+      if: ${{ github.event_name == 'push' }}
+      with:
+        token: ${{ github.token }}
+        args: git
+      env:
+        DD_APP_KEY: xxxAppKey
+        DD_API_KEY: xxxApiKey
+```
+
 ## Why morty / post mortems as a repository?
 
 - An incident history you can analyse

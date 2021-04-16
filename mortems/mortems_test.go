@@ -14,6 +14,7 @@ import (
 var _ = Describe("Mortems", func() {
 	var mortems MortemCollector
 	var gitService *mortemsfakes.FakeGitService
+	var reportingService *mortemsfakes.FakeReportingService
 	var treeEntryFixtures map[string]*RepoFiles
 
 	BeforeEach(func() {
@@ -22,7 +23,8 @@ var _ = Describe("Mortems", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		gitService = new(mortemsfakes.FakeGitService)
-		mortems = NewMortemCollector(gitService)
+		reportingService = new(mortemsfakes.FakeReportingService)
+		mortems = NewMortemReportingCollector(gitService, reportingService)
 	})
 
 	Context("an empty, uninitialized repository", func() {
@@ -105,6 +107,30 @@ var _ = Describe("Mortems", func() {
 			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Love Lost Globally: Jerry Develops Malicious App"))
 			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("July 2020"))
 		})
+
+		It("sends metrics about new mortem to reporter", func() {
+			Expect(mortems.Collect()).To(Succeed())
+
+			Expect(reportingService.ReportSeverityCallCount()).To(Equal(1))
+			severity := reportingService.ReportSeverityArgsForCall(0)
+			Expect(severity).To(Equal("1"))
+
+			Expect(reportingService.ReportDetectCallCount()).To(Equal(1))
+			detect, severity := reportingService.ReportDetectArgsForCall(0)
+			Expect(detect).To(Equal(time.Minute * 4))
+			Expect(severity).To(Equal("1"))
+
+			Expect(reportingService.ReportResolveCallCount()).To(Equal(1))
+			resolve, severity := reportingService.ReportResolveArgsForCall(0)
+			Expect(resolve).To(Equal(time.Hour*6 + time.Minute*14))
+			Expect(severity).To(Equal("1"))
+
+			Expect(reportingService.ReportDowntimeCallCount()).To(Equal(1))
+			downtime, severity := reportingService.ReportDowntimeArgsForCall(0)
+			Expect(downtime).To(Equal(time.Hour*6 + time.Minute*28))
+			Expect(severity).To(Equal("1"))
+
+		})
 	})
 
 	Context("two post mortems in the same month", func() {
@@ -129,6 +155,17 @@ var _ = Describe("Mortems", func() {
 			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Love Lost Globally: Jerry Develops Malicious App"))
 			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("Bad Parenting: Rick Clones Own Daughter"))
 			Expect(updateFiles.GetFile("README.md")).To(BeFileWithSubstring("July 2020"))
+		})
+
+		It("sends metrics about new mortems to reporter", func() {
+			Expect(mortems.Collect()).To(Succeed())
+
+			invocations := reportingService.Invocations()
+
+			Expect(invocations["ReportSeverity"]).To(ContainElements([]interface{}{"1"}, []interface{}{"2"}))
+			Expect(invocations["ReportDetect"]).To(ContainElements([]interface{}{time.Minute * 4, "1"}, []interface{}{time.Hour * 26, "2"}))
+			Expect(invocations["ReportResolve"]).To(ContainElements([]interface{}{time.Hour*6 + time.Minute*14, "1"}, []interface{}{time.Minute * 3, "2"}))
+			Expect(invocations["ReportDowntime"]).To(ContainElements([]interface{}{time.Hour*6 + time.Minute*28, "1"}, []interface{}{time.Hour*26 + time.Minute*3, "2"}))
 		})
 	})
 
@@ -231,7 +268,7 @@ func SecondMortem() MortemData {
 		Title:    "Bad Parenting: Rick Clones Own Daughter",
 		Owner:    "Rick Sanchez",
 		Date:     time.Date(2020, time.July, 27, 0, 0, 0, 0, time.UTC),
-		Severity: "1",
+		Severity: "2",
 		Detect:   detectTime,
 		Resolve:  resolveTime,
 		Downtime: totalDownTime,

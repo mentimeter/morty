@@ -2,3 +2,4 @@
 
 wget https://github.com/mentimeter/morty/releases/latest/download/morty_darwin_amd64
 mv morty_darwin_amd64 morty
+chmod +x morty
