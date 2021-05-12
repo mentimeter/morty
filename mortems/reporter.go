@@ -2,7 +2,9 @@ package mortems
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	datadog "github.com/DataDog/datadog-api-client-go/api/v1/datadog"
@@ -50,10 +52,15 @@ func (d *DatadogReporter) ReportDowntime(downtime time.Duration, severity string
 }
 
 func (d *DatadogReporter) sendMetric(name string, value float64, tags []string) error {
-	series := datadog.NewSeries(name, [][]float64{{float64(time.Now().Unix()), float64(value)}})
+	series := datadog.NewSeries(name, [][]float64{{float64(time.Now().Unix()), value}})
 	series.SetType("count")
 	series.SetTags(tags)
 	body := *datadog.NewMetricsPayload([]datadog.Series{*series})
-	_, _, err := d.apiClient.MetricsApi.SubmitMetrics(d.ctx).Body(body).Execute()
+	resp, _, err := d.apiClient.MetricsApi.SubmitMetrics(d.ctx).Body(body).Execute()
+
+	// response from `SubmitMetrics`: IntakePayloadAccepted
+	responseContent, _ := json.MarshalIndent(resp, "", "  ")
+	fmt.Fprintf(os.Stdout, "Response from MetricsApi.SubmitMetrics:\n%s\n", responseContent)
+
 	return err
 }
